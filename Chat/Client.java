@@ -47,7 +47,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
         setLayout(new FlowLayout(FlowLayout.CENTER));
         try
         {
-            socket = new Socket("localhost", 30000);
+            socket = new Socket("tanel.ddns.net", 30000);
             // this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -82,12 +82,15 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
                 send.addActionListener(this);
                 message.addMouseListener(this);
                 message.addKeyListener(this);
-                // add(log);
 
                 setSize(500, 500);
                 setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 this.setVisible(true);
-            }else new CredentialsHandler();
+            }
+            else
+            {
+                new CredentialsHandler(5);
+            } 
         }
         catch (IOException constructor)
         {
@@ -307,6 +310,35 @@ class CredentialsHandler extends JFrame implements ActionListener, KeyListener
         add(pass);
         add(password);
         add(button);
+        button.addActionListener(this);
+        password.addKeyListener(this);
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(250, 250);
+        setVisible(true);
+    }
+
+    CredentialsHandler(int skata)
+    {
+        super("Authorization");
+        setLayout(new FlowLayout());
+        
+        JLabel wrong = new JLabel("Incorrect username or password");
+        
+        uname = new JLabel("Username ");
+        pass = new JLabel("Password ");
+
+        username = new JTextField(10);
+        password = new JTextField(10);
+
+        button = new JButton("Submit");
+
+        add(uname);
+        add(username);
+        add(pass);
+        add(password);
+        add(button);
+        add(wrong);
         button.addActionListener(this);
         password.addKeyListener(this);
         
