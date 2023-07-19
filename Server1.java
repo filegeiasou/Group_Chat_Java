@@ -7,6 +7,8 @@ import java.awt.event.*;
 public class Server1 extends JFrame implements ActionListener {
     private ServerSocket serverSocket;
     private Socket clientSocket;
+    private BufferedReader in;
+    private PrintWriter out;
     Server1(int port)
     {
         try {
@@ -20,9 +22,30 @@ public class Server1 extends JFrame implements ActionListener {
     {
         try {
             clientSocket = serverSocket.accept();
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+
+            Thread messageHandlerThread = new Thread(() -> handleIncomingMessages());
+            messageHandlerThread.start();
         }
         catch (Exception e)
         {
+            e.printStackTrace();
+        }
+    }
+    private void handleIncomingMessages()
+    {
+        String message,message1;
+        int cnt = 0;
+        try {
+            while ((message = in.readLine()) != null) {
+                System.out.println("Client: " + message);
+                if(cnt==0)
+                {
+                    message1 = message + " ";
+                }  
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
