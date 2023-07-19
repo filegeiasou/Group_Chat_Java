@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.Scanner;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -27,7 +26,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     private Socket socket;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
-    private String username;
+    private String username, password, banana;
 
     // JFrame stuff
     JLabel log_label;
@@ -39,52 +38,56 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     /**
      * The constructor of the Client implements all the JFrame stuff.
      * It also initializes all the needed values for the client.
-     * 
-     * 
-     * @param socket Used to pass a socket with an address and port number in the constructor.
+     *  
      */
     
-    public Client(Socket socket)
+    public Client(String username, String password)
     {
         super("Chat Application");
         setLayout(new FlowLayout(FlowLayout.CENTER));
         try
         {
-            this.socket = socket;
+            socket = new Socket("localhost", 30000);
+            // this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            //this.username = username;
+            this.username = username;
+            this.password = password;
 
-            username = JOptionPane.showInputDialog("Enter your username");
+            sendMessage();
 
-            log_label = new JLabel("Logged in as : " + this.username);
-            
-            // log.setBounds(150, 90, 200, 30);
-            // log.setBounds(10, 10, 150, 20);
-            // uname = new JTextField("Enter your username", 10);
-            // username = userName;
+            // username = JOptionPane.showInputDialog("Enter your username");
 
-            chat = new JTextArea(15, 30);
-            scroll = new JScrollPane(chat, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-            scroll.setPreferredSize(new Dimension(400, 300));
-            chat.setEditable(false);
+            if(banana.equals("true"))
+            {
+                log_label = new JLabel("Logged in as : " + this.username);
+                
+                // log.setBounds(150, 90, 200, 30);
+                // log.setBounds(10, 10, 150, 20);
+                // uname = new JTextField("Enter your username", 10);
+                // username = userName;
 
-            send = new JButton("Send");
-            message = new JTextField("Type your message", 15);
+                chat = new JTextArea(15, 30);
+                scroll = new JScrollPane(chat, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+                scroll.setPreferredSize(new Dimension(400, 300));
+                chat.setEditable(false);
 
-            // add(chat);
-            add(scroll);
-            add(message);
-            add(send);
-            add(log_label);
-            send.addActionListener(this);
-            message.addMouseListener(this);
-            message.addKeyListener(this);
-            // add(log);
+                send = new JButton("Send");
+                message = new JTextField("Type your message", 15);
 
-            setSize(500, 500);
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setVisible(true);
+                add(scroll);
+                add(message);
+                add(send);
+                add(log_label);
+                send.addActionListener(this);
+                message.addMouseListener(this);
+                message.addKeyListener(this);
+                // add(log);
+
+                setSize(500, 500);
+                setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                this.setVisible(true);
+            }else new CredentialsHandler();
         }
         catch (IOException constructor)
         {
@@ -100,7 +103,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
             String msgToSend = message.getText();
             try
             {
-                bufferedWriter.write(username + " : " + msgToSend);
+                bufferedWriter.write(this.username + " : " + msgToSend);
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
                 message.setText("");
@@ -116,19 +119,22 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     {   
         try
         {
-            bufferedWriter.write(username);
+            bufferedWriter.write(this.username);
+            bufferedWriter.newLine();
+            bufferedWriter.write(this.password);
             bufferedWriter.newLine();
             bufferedWriter.flush();
 
-            Scanner msg = new Scanner(System.in);
-            while(socket.isConnected())
-            {
-                String messageToSend = msg.nextLine();
-                bufferedWriter.write(username + " : " + messageToSend);
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
-            }
-            msg.close();
+            banana = bufferedReader.readLine();
+            // Scanner msg = new Scanner(System.in);
+            // while(socket.isConnected())
+            // {
+            //     String messageToSend = msg.nextLine();
+            //     bufferedWriter.write("banana" + " : " + messageToSend);
+            //     bufferedWriter.newLine();
+            //     bufferedWriter.flush();
+            // }
+            // msg.close();
         }
         catch (IOException message_send)
         {
@@ -156,7 +162,6 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
                     {
                         msgFromGroupChat = bufferedReader.readLine();
                         chat.append(msgFromGroupChat + "\n");
-                        // System.out.println(msgFromGroupChat);
                     }
                     catch (IOException incoming_message)
                     {
@@ -200,37 +205,6 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
         {
             close.printStackTrace();
         }
-    }
-
-    /**
-     * Initializes the socket and then passes it to the Client Constructor.
-     * Also handles messages
-     * 
-     * @throws IOException
-     */
-    public static void createClient() throws IOException
-    {
-        // Scanner enter = new Scanner(System.in);
-        // System.out.println("Enter your username for the group chat: ");
-        // String username = enter.nextLine();
-        Socket socket = new Socket("localhost", 30000);
-        Client client = new Client(socket); /* , username*/
-        client.ListenForMessage();
-        client.sendMessage();
-        // enter.close();
-    }
-
-
-    /**
-     * Calls the createClient method that creates all the necessary stuff for a client
-     * like initialize a socket, call the constructor and handle the messages.
-     * 
-     * @param args
-     * @throws IOException
-     */
-    public static void main(String[] args) throws IOException
-    {
-        createClient();
     }
 
     // Mouse Listeners for some extra stuff that i will probably use later on
@@ -292,4 +266,89 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
         
     }
 
+    /**
+     * Calls the createClient method that creates all the necessary stuff for a client
+     * like initialize a socket, call the constructor and handle the messages.
+     * 
+     * @param args
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException
+    {
+        new CredentialsHandler();
+        // createClient();
+    }
+
+}
+
+class CredentialsHandler extends JFrame implements ActionListener, KeyListener
+{
+    private JLabel uname, pass;
+    private JTextField username, password;
+    private JButton button;
+    
+    Client client1;
+
+    CredentialsHandler()
+    {
+        super("Authorization");
+        setLayout(new FlowLayout());
+
+        uname = new JLabel("Username ");
+        pass = new JLabel("Password ");
+
+        username = new JTextField(10);
+        password = new JTextField(10);
+
+        button = new JButton("Submit");
+
+        add(uname);
+        add(username);
+        add(pass);
+        add(password);
+        add(button);
+        button.addActionListener(this);
+        password.addKeyListener(this);
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(250, 250);
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+        if(e.getSource() == button)
+        {            
+            Client c1 = new Client(username.getText(), password.getText());
+            // c1.sendMessage();
+            setVisible(false);
+            c1.ListenForMessage();
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        
+    }
+
+    @Override
+        public void keyPressed(KeyEvent e)
+        {
+            if(e.getKeyCode() == KeyEvent.VK_ENTER)
+            {
+                if(!username.getText().equals(""))
+                {
+                    Client c1 = new Client(username.getText(), password.getText());
+                    // c1.sendMessage();
+                    setVisible(false);
+                    c1.ListenForMessage();
+                }
+            }
+        }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        
+    }   
 }

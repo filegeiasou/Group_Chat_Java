@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class Server
 {
     private ServerSocket serverSocket;
+    String clientname, clientpass;
 
     public Server(ServerSocket serverSocket)
     {
@@ -34,7 +35,11 @@ public class Server
                 
                 // System.out.println("A new client has connected");
                 ClientHandler client = new ClientHandler(ssocket);
-                System.out.println(client.getName() + " has connected");
+                
+                clientname = client.getName();
+                clientpass = client.getPassword();
+
+                System.out.println(client.getName() + " has connected with pass : " + clientpass);
 
                 Thread server_thread = new Thread(client);
                 server_thread.start();
@@ -79,9 +84,11 @@ class ClientHandler implements Runnable
     private Socket socket;
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
-    private String clientUsername;
+    private String clientUsername, clientPassword;
+    private String connected = "false";
 
     public String getName() {return clientUsername;}
+    public String getPassword() {return clientPassword;}
 
     /**
      * Constructor for the ClientHandler class that is used to handle the clients
@@ -97,12 +104,37 @@ class ClientHandler implements Runnable
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.clientUsername = bufferedReader.readLine();
-            clients.add(this);
-            broadcastMessage("Server : " + clientUsername + " has joined the chat.");
+            this.clientPassword = bufferedReader.readLine();
+
+            check(this.clientUsername, this.clientPassword);
+            if(connected.equals("true"))
+            {
+                clients.add(this);
+                broadcastMessage("Server : " + clientUsername + " has joined the chat.");
+            }
         }
         catch(IOException ioe)
         {
             closeEverything(socket, bufferedReader, bufferedWriter);
+        }
+    }
+
+    public void check(String username, String password)
+    {
+        if(this.clientUsername.equals("tsav") && this.clientPassword.equals("tsav"))
+        {
+            connected = "true";
+        }
+
+        try
+        {
+            bufferedWriter.write(connected);
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
 
