@@ -1,5 +1,3 @@
-package ChatApp;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -119,9 +117,21 @@ class ClientHandler implements Runnable
         }
     }
 
+    /**
+     * Checks if the credentials given by the user are valid.
+     * If they are then set the connected String to 
+     * 
+     * @param username
+     * @param password
+     */
+
     public void check(String username, String password)
     {
         if(this.clientUsername.equals("tsav") && this.clientPassword.equals("tsav"))
+        {
+            connected = "true";
+        }
+        else if(this.clientUsername.equals("re") && this.clientPassword.equals("re"))
         {
             connected = "true";
         }
@@ -150,8 +160,6 @@ class ClientHandler implements Runnable
         {
             try
             {
-                // if(!client.socket.equals(socket))
-
                 // If i want to change whether the sender sees his own message,
                 // then i need to use the command above
                 
