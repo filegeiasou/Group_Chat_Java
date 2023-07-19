@@ -44,6 +44,7 @@ public class Server1 extends JFrame implements ActionListener {
                 {
                     message1 = message + " ";
                 }  
+                cnt++;
             }
         } catch (IOException e) {
             e.printStackTrace();
