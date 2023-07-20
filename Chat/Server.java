@@ -38,7 +38,7 @@ public class Server
                 clientname = client.getName();
                 clientpass = client.getPassword();
 
-                System.out.println(client.getName() + " has connected with pass : " + clientpass);
+                System.out.println(client.getName() + " has connected with pass ");
 
                 Thread server_thread = new Thread(client);
                 server_thread.start();
