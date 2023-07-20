@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 import javax.swing.*;
+
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -22,13 +23,13 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
 {
     static final String msgPhrase = "Type your message";
 
-    // Non JFrame stuff
+    // Networking
     private Socket socket;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
-    private String username, password, banana;
+    private String username, password, feedback;
 
-    // JFrame stuff
+    // GUI Components
     JLabel log_label;
     JButton send;
     JTextField message;
@@ -44,63 +45,82 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     public Client(String username, String password)
     {
         super("Chat Application");
-        setLayout(new FlowLayout(FlowLayout.CENTER));
+        this.username = username;
+        this.password = password;
+
+        initializeNetworking();
+        displayChatUI();
+        // username = JOptionPane.showInputDialog("Enter your username");
+
+    }
+
+    private void initializeNetworking()
+    {
         try
         {
-            socket = new Socket("tanel.ddns.net", 30000);
-            // this.socket = socket;
-            this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.username = username;
-            this.password = password;
+            socket = new Socket("localhost", 30000);
+            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
             sendMessage();
 
-            // username = JOptionPane.showInputDialog("Enter your username");
-
-            if(banana.equals("true"))
-            {
-                log_label = new JLabel("Logged in as : " + this.username);
-                
-                // log.setBounds(150, 90, 200, 30);
-                // log.setBounds(10, 10, 150, 20);
-                // uname = new JTextField("Enter your username", 10);
-                // username = userName;
-
-                chat = new JTextArea(15, 30);
-                scroll = new JScrollPane(chat, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-                scroll.setPreferredSize(new Dimension(400, 300));
-                chat.setEditable(false);
-
-                send = new JButton("Send");
-                message = new JTextField("Type your message", 15);
-
-                add(scroll);
-                add(message);
-                add(send);
-                add(log_label);
-                send.addActionListener(this);
-                message.addMouseListener(this);
-                message.addKeyListener(this);
-
-                setSize(500, 500);
-                setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                this.setVisible(true);
-            }
-            else
-            {
-                new CredentialsHandler(5);
-            } 
-        }
-        catch (IOException constructor)
+        } catch (IOException e)
         {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
+    private void showInvalidCredentialsMessage()
+    {
+        JOptionPane.showMessageDialog(this, "Invalid username or password. Please try again", feedback, JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void initializeGUI()
+    {
+        setLayout(new FlowLayout(FlowLayout.CENTER));
+
+        // This displays the logged in user's username
+        // E.g if someone connects with username Nick, it will display it on the chat window
+        log_label = new JLabel("Logged in as : " + this.username);
+        
+        // A Text Area is initialized, and then is embedded in a Scroll Panel,
+        // that lets us scroll the chat up, down, left and right.
+        chat = new JTextArea(15, 30);
+        scroll = new JScrollPane(chat, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setPreferredSize(new Dimension(400, 300)); // sets dimensions for scroll panel
+        chat.setEditable(false); // sets the text area to non-editable because we dont want to just write on the area
+
+        send = new JButton("Send"); // button to send message
+        message = new JTextField("Type your message", 15); // text field where you write the message you want to send
+
+        // add all the elements to the frame, and to the appropriate action listeners
+        add(scroll);
+        add(message);
+        add(send);
+        add(log_label);
+        send.addActionListener(this);
+        message.addMouseListener(this); 
+        message.addKeyListener(this);
+
+        setSize(500, 500); // set size of frame
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // exit when X is clicked
+        this.setVisible(true); // show the frame
+    }
+
+    private void displayChatUI()
+    {
+        if(feedback.equals("true"))
+        {
+            initializeGUI();
+            ListenForMessage();
+        }else showInvalidCredentialsMessage();
+        
+    }
+
     @Override
     public void actionPerformed(ActionEvent e)
     {
+        // If the send button is pressed, then we send the message
         if(e.getSource() == send)
         {
             String msgToSend = message.getText();
@@ -122,22 +142,17 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     {   
         try
         {
+            // In the code below, we send the username and the password to the server,
+            // so it can check if the credentials (usename, password) are valid.
             bufferedWriter.write(this.username);
             bufferedWriter.newLine();
             bufferedWriter.write(this.password);
             bufferedWriter.newLine();
             bufferedWriter.flush();
 
-            banana = bufferedReader.readLine();
-            // Scanner msg = new Scanner(System.in);
-            // while(socket.isConnected())
-            // {
-            //     String messageToSend = msg.nextLine();
-            //     bufferedWriter.write("banana" + " : " + messageToSend);
-            //     bufferedWriter.newLine();
-            //     bufferedWriter.flush();
-            // }
-            // msg.close();
+            // Here we get the feedback from the server about the credentials
+            feedback = bufferedReader.readLine();
+            
         }
         catch (IOException message_send)
         {
@@ -174,6 +189,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
             }
         };
 
+        // We assign a thread to run our runnable interface, and then we actually start it
         Thread client_thread = new Thread(runnable1);
         client_thread.start();
     }
@@ -240,11 +256,6 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-             
-    }
-
-    @Override
     public void keyPressed(KeyEvent e)
     {
         if(e.getKeyCode() == KeyEvent.VK_ENTER)
@@ -265,13 +276,13 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        
-    }
+    public void keyReleased(KeyEvent e) {}
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
 
     /**
-     * Calls the createClient method that creates all the necessary stuff for a client
-     * like initialize a socket, call the constructor and handle the messages.
+     * Calls the CredentialsHandler constructor, that actually is used for some GUI.
      * 
      * @param args
      * @throws IOException
@@ -279,32 +290,36 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     public static void main(String[] args) throws IOException
     {
         new CredentialsHandler();
-        // createClient();
     }
 
 }
 
 class CredentialsHandler extends JFrame implements ActionListener, KeyListener
 {
-    private JLabel uname, pass;
+    private JLabel uname, pass, wrong;
     private JTextField username, password;
     private JButton button;
-    
-    Client client1;
 
     CredentialsHandler()
     {
         super("Authorization");
         setLayout(new FlowLayout());
 
+        // Labels
         uname = new JLabel("Username ");
         pass = new JLabel("Password ");
 
-        username = new JTextField(10);
-        password = new JTextField(10);
+        username = new JTextField(10); // text field for username
+        password = new JPasswordField(10); // used JPasswordField to censor password
 
+        // Button to submit credentials
         button = new JButton("Submit");
 
+        wrong = new JLabel("Incorrect username or password");
+        wrong.setVisible(false);
+        add(wrong);
+
+        // Adding all the components to
         add(uname);
         add(username);
         add(pass);
@@ -318,9 +333,8 @@ class CredentialsHandler extends JFrame implements ActionListener, KeyListener
         setVisible(true);
     }
 
-    CredentialsHandler(int skata)
+    CredentialsHandler(String connected)
     {
-        super("Authorization");
         setLayout(new FlowLayout());
         
         JLabel wrong = new JLabel("Incorrect username or password");
