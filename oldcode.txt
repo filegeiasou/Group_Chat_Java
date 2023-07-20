@@ -1,0 +1,9 @@
+// Scanner msg = new Scanner(System.in);
+// while(socket.isConnected())
+// {
+//     String messageToSend = msg.nextLine();
+//     bufferedWriter.write("banana" + " : " + messageToSend);
+//     bufferedWriter.newLine();
+//     bufferedWriter.flush();
+// }
+// msg.close();
