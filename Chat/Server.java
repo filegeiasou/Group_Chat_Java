@@ -127,13 +127,47 @@ class ClientHandler implements Runnable
 
     public void check(String username, String password)
     {
-        if(this.clientUsername.equals("tsav") && this.clientPassword.equals("tsav"))
-        {
-            connected = "true";
-        }
-        else if(this.clientUsername.equals("re") && this.clientPassword.equals("re"))
-        {
-            connected = "true";
+
+        String url = "jdbc:mysql://localhost:3306/mydatabase"; // Replace 'localhost' with your MySQL server address
+        String username2 = "root";
+        String password3 = "root";
+        Connection connection = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // Step 1: Establish the connection
+            connection = DriverManager.getConnection(url, username2, password3);
+
+            // Step 2: Create a statement
+            Statement stmt = connection.createStatement();
+
+            // Step 3: Create a table (you can skip this step if the table already exists)
+
+            // Step 4: Insert data into the table
+            String insertQuery = "INSERT INTO users VALUES ('John', 'xountas') , ('Jim','kont')";
+            stmt.executeUpdate(insertQuery);
+
+            // Step 5: Retrieve data from the table
+            String selectQuery = "SELECT * FROM users";
+            ResultSet rs = stmt.executeQuery(selectQuery);
+
+            // Step 6: Process the results
+            while (rs.next()) {
+                //int id = rs.getInt("id");
+                String username1 = rs.getString("username");
+                String pass = rs.getString("password");
+                System.out.println("Name: " + username1 + ", Age: " + pass);
+                if(this.clientUsername.equals(username1) && this.clientPassword.equals(pass))
+                {
+                    connected = "true";
+                }
+            }
+
+            // Step 7: Close the resources
+            rs.close();
+            stmt.close();
+            connection.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         try
