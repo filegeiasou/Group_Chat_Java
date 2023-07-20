@@ -1,12 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
+package ChatApp;
 
-import java.net.*;
+import java.util.ArrayList;
+
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import java.io.*;
-import java.util.*;
-import java.sql.*;
 
 
 public class Server
@@ -32,13 +31,13 @@ public class Server
                 // accept() haults the program
                 Socket ssocket = serverSocket.accept();
                 
-                // System.out.println("A new client has connected");
                 ClientHandler client = new ClientHandler(ssocket);
                 
+                // Get the credentials from the user
                 clientname = client.getName();
                 clientpass = client.getPassword();
 
-                System.out.println(client.getName() + " has connected with pass ");
+                System.out.println(client.getName() + " has connected");
 
                 Thread server_thread = new Thread(client);
                 server_thread.start();
@@ -128,55 +127,14 @@ class ClientHandler implements Runnable
 
     public void check(String username, String password)
     {
-
-        String url = "jdbc:mysql://localhost:3306/mydatabase"; // Replace 'localhost' with your MySQL server address
-        String username2 = "root";
-        String password3 = "root";
-        Connection connection = null;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            // Step 1: Establish the connection
-            connection = DriverManager.getConnection(url, username2, password3);
-
-            // Step 2: Create a statement
-            Statement stmt = connection.createStatement();
-
-            // Step 3: Create a table (you can skip this step if the table already exists)
-
-            // Step 4: Insert data into the table
-            /*String insertQuery = "INSERT INTO users VALUES ('John', 'xountas') , ('Jim','kont')";
-            stmt.executeUpdate(insertQuery);*/
-
-            // Step 5: Retrieve data from the table
-            String selectQuery = "SELECT * FROM users";
-            ResultSet rs = stmt.executeQuery(selectQuery);
-
-            // Step 6: Process the results
-            while (rs.next()) {
-                //int id = rs.getInt("id");
-                String username1 = rs.getString("username");
-                String pass = rs.getString("password");
-                System.out.println("Name: " + username1 + ", Age: " + pass);
-                System.out.println("Name: " + this.clientUsername + ", pass: " + this.clientPassword);
-                if(this.clientUsername.equals(username1) && this.clientPassword.equals(pass))
-                {
-                    System.out.println("1");
-                    connected = "true";
-                    break;
-                }
-            }
-
-            // Step 7: Close the resources
-            rs.close();
-            stmt.close();
-            connection.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(this.clientUsername.equals("tsav") && this.clientPassword.equals("tsav")
+           || this.clientUsername.equals("re") && this.clientPassword.equals("re"))
+        {
+            connected = "true";
         }
-        
+
         try
         {
-            System.out.println("1" + connected);
             bufferedWriter.write(connected);
             bufferedWriter.newLine();
             bufferedWriter.flush();

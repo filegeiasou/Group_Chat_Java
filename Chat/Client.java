@@ -39,7 +39,6 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
         initializeNetworking();
         displayChatUI();
         // username = JOptionPane.showInputDialog("Enter your username");
-
     }
 
     private void initializeNetworking()
@@ -47,6 +46,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
         try
         {
             socket = new Socket("localhost", 30000);
+
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
@@ -91,7 +91,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
         message.addMouseListener(this); 
         message.addKeyListener(this);
 
-        pack();
+        pack(); // needed in order to show the windows realitively centered
         setLocationRelativeTo(null);
         setResizable(false);
         setSize(500, 500); // set size of frame
@@ -106,7 +106,6 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
             initializeGUI();
             ListenForMessage();
         }else showInvalidCredentialsMessage();
-        
     }
 
     @Override
@@ -319,7 +318,7 @@ class CredentialsHandler extends JFrame implements ActionListener, KeyListener
         button.addActionListener(this);
         password.addKeyListener(this);
         
-        pack();
+        pack(); // same as the client
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -334,7 +333,7 @@ class CredentialsHandler extends JFrame implements ActionListener, KeyListener
         if(e.getSource() == button)
         {            
             Client c1 = new Client(username.getText(), password.getText());
-            // c1.sendMessage();
+            
             if(c1.count == 0)
             {
                 setVisible(false);
