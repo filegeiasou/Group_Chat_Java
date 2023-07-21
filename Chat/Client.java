@@ -1,4 +1,4 @@
-package ChatApp;
+//package ChatApp;
 
 import java.io.*;
 import javax.swing.*;
@@ -27,9 +27,9 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
     /**
      * The constructor of the Client implements all the JFrame stuff.
      * It also initializes all the needed values for the client.
-     *  
+     *
      */
-    
+
     public Client(String username, String password)
     {
         super("Chat Application");
@@ -71,7 +71,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
         // This displays the logged in user's username
         // E.g if someone connects with username Nick, it will display it on the chat window
         log_label = new JLabel("Logged in as : " + this.username);
-        
+
         // A Text Area is initialized, and then is embedded in a Scroll Panel,
         // that lets us scroll the chat up, down, left and right.
         chat = new JTextArea(15, 30);
@@ -88,7 +88,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
         add(send);
         add(log_label);
         send.addActionListener(this);
-        message.addMouseListener(this); 
+        message.addMouseListener(this);
         message.addKeyListener(this);
 
         pack(); // needed in order to show the windows realitively centered
@@ -125,12 +125,12 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
             catch(IOException actionlistener)
             {
                 closeEverything(socket, bufferedReader, bufferedWriter);
-            }   
+            }
         }
     }
 
     public void sendMessage()
-    {   
+    {
         try
         {
             // In the code below, we send the username and the password to the server,
@@ -143,7 +143,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
 
             // Here we get the feedback from the server about the credentials
             feedback = bufferedReader.readLine();
-            
+
         }
         catch (IOException message_send)
         {
@@ -153,8 +153,8 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
 
     /**
      * This method implements a Runnable interface, and overrides the run method
-     * in order to listen to oncoming messages from anothre client. 
-     * 
+     * in order to listen to oncoming messages from anothre client.
+     *
      */
     public void ListenForMessage()
     {
@@ -187,7 +187,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
 
     /**
      * Almost identical as the Server's closeEverything method that closes the bufferedReader, bufferedWriter, and the socket
-     * 
+     *
      * @param socket
      * @param bufferedReader
      * @param bufferedWriter
@@ -200,7 +200,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
             {
                 bufferedReader.close();
             }
-            
+
             if(bufferedWriter != null)
             {
                 bufferedWriter.close();
@@ -226,10 +226,10 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
             message.setText("");
         }
     }
-    
+
     @Override
     public void mousePressed(MouseEvent e) {
-        
+
     }
 
     @Override
@@ -238,12 +238,12 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        
+
     }
 
     @Override
     public void mouseExited(MouseEvent e){
-        
+
     }
 
     @Override
@@ -274,7 +274,7 @@ public class Client extends JFrame implements ActionListener, MouseListener, Key
 
     /**
      * Calls the CredentialsHandler constructor, that actually is used for some GUI.
-     * 
+     *
      * @param args
      * @throws IOException
      */
@@ -307,7 +307,7 @@ class CredentialsHandler extends JFrame implements ActionListener, KeyListener
         button = new JButton("Submit");
 
         wrong = new JLabel("");
-        
+
         // Adding all the components to
         add(uname);
         add(username);
@@ -317,7 +317,7 @@ class CredentialsHandler extends JFrame implements ActionListener, KeyListener
         add(wrong);
         button.addActionListener(this);
         password.addKeyListener(this);
-        
+
         pack(); // same as the client
         setLocationRelativeTo(null);
         setResizable(false);
@@ -326,14 +326,14 @@ class CredentialsHandler extends JFrame implements ActionListener, KeyListener
         setVisible(true);
     }
 
-    
+
     @Override
     public void actionPerformed(ActionEvent e)
     {
         if(e.getSource() == button)
-        {            
+        {
             Client c1 = new Client(username.getText(), password.getText());
-            
+
             if(c1.count == 0)
             {
                 setVisible(false);
@@ -344,40 +344,40 @@ class CredentialsHandler extends JFrame implements ActionListener, KeyListener
                 password.setText("");
                 wrong.setText("Incorrect username or password");
             }
-            
+
             c1.ListenForMessage();
         }
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-        
+
     }
 
     @Override
-        public void keyPressed(KeyEvent e)
+    public void keyPressed(KeyEvent e)
+    {
+        if(e.getKeyCode() == KeyEvent.VK_ENTER)
         {
-            if(e.getKeyCode() == KeyEvent.VK_ENTER)
+            if(!username.getText().equals(""))
             {
-                if(!username.getText().equals(""))
+                Client c1 = new Client(username.getText(), password.getText());
+                // c1.sendMessage();
+                if(c1.count == 0)
+                    setVisible(false);
+                else
                 {
-                    Client c1 = new Client(username.getText(), password.getText());
-                    // c1.sendMessage();
-                    if(c1.count == 0)
-                        setVisible(false);
-                    else
-                    {
-                        username.setText("");
-                        password.setText("");
-                        wrong.setText("Incorrect username or password");
-                    }
-                    c1.ListenForMessage();
+                    username.setText("");
+                    password.setText("");
+                    wrong.setText("Incorrect username or password");
                 }
+                c1.ListenForMessage();
             }
         }
+    }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        
-    }   
+
+    }
 }
