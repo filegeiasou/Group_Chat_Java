@@ -1,11 +1,10 @@
-package ChatApp;
+//package ChatApp;
 
 import java.util.ArrayList;
-
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import java.io.*;
+import java.sql.*;
 
 
 public class Server
@@ -30,9 +29,9 @@ public class Server
             {
                 // accept() haults the program
                 Socket ssocket = serverSocket.accept();
-                
+
                 ClientHandler client = new ClientHandler(ssocket);
-                
+
                 // Get the credentials from the user
                 clientname = client.getName();
                 clientpass = client.getPassword();
@@ -91,7 +90,7 @@ class ClientHandler implements Runnable
     /**
      * Constructor for the ClientHandler class that is used to handle the clients
      * using other methods
-     * 
+     *
      * @param socket
      */
     public ClientHandler(Socket socket)
@@ -119,27 +118,51 @@ class ClientHandler implements Runnable
 
     /**
      * Checks if the credentials given by the user are valid.
-     * If they are then set the connected String to 
-     * 
+     * If they are then set the connected String to true
+     *
      * @param username
      * @param password
      */
 
     public void check(String username, String password)
     {
-        if(this.clientUsername.equals("tsav") && this.clientPassword.equals("tsav")
-           || this.clientUsername.equals("re") && this.clientPassword.equals("re"))
-        {
-            connected = "true";
-        }
-
         try
         {
-            bufferedWriter.write(connected);
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        }
-        catch (IOException e)
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/chat", "root", "root");
+
+            // Statement statement = connection.createStatement();
+            // ResultSet resultSet = statement.executeQuery("SELECT * FROM USERS");
+
+            String query = "SELECT * FROM USERS WHERE USERNAME = ? AND PASSW = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next())
+            {
+                connected = "true";
+                // System.out.println("Username : " + resultSet.getString("USERNAME") + " Password : " + resultSet.getString("PASSW"));
+            }
+            else
+            {
+                connected = "false";
+            }
+
+            try {
+                bufferedWriter.write(connected);
+                bufferedWriter.newLine();
+                bufferedWriter.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Close resources
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+        } catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -148,7 +171,7 @@ class ClientHandler implements Runnable
     /**
      * This method iterates through the clients ArrayList and
      * broadcast the message to every client that is in the ArrayList.
-     * 
+     *
      * @param messageToSend Message to broadcast to other clients connected.
      */
     public void broadcastMessage(String messageToSend)
@@ -159,7 +182,7 @@ class ClientHandler implements Runnable
             {
                 // If i want to change whether the sender sees his own message,
                 // then i need to use the command above
-                
+
                 client.bufferedWriter.write(messageToSend);
                 client.bufferedWriter.newLine();
                 client.bufferedWriter.flush();
@@ -182,10 +205,10 @@ class ClientHandler implements Runnable
 
     /**
      * Closes everything related to a client.
-     * 
+     *
      * When a client disconnectd it prints it in the terminal, runs the removeClient method,
      * and then closes the socket, bufferedReader and bufferedWriter.
-     * 
+     *
      * @param socket
      * @param bufferedReader
      * @param bufferedWriter
@@ -200,7 +223,7 @@ class ClientHandler implements Runnable
             {
                 bufferedReader.close();
             }
-            
+
             if(bufferedWriter != null)
             {
                 bufferedWriter.close();
@@ -221,7 +244,7 @@ class ClientHandler implements Runnable
     /**
      * Handles incoming messages from clients, and broadcasts the message while the socket is connected.
      */
-    
+
     @Override
     public void run()
     {
