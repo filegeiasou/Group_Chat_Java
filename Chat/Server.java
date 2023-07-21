@@ -1,5 +1,6 @@
 //package ChatApp;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,7 +8,7 @@ import java.io.*;
 import java.sql.*;
 
 
-// I havent found a way yet to host the server in VSCode, so its only possible in IntelliJ or NetBeans for now.
+// I haven't found a way yet to host the server in VSCode, so its only possible in IntelliJ or NetBeans for now.
 
 public class Server
 {
@@ -246,7 +247,6 @@ class ClientHandler implements Runnable
             ioe.printStackTrace();
         }
     }
-
 
     /**
      * Handles incoming messages from clients, and broadcasts the message while the socket is connected.
