@@ -1,9 +1,9 @@
 //package ChatApp;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.util.*;
+import java.net.*;
+import java.net.*;
 import java.io.*;
 import java.sql.*;
 
