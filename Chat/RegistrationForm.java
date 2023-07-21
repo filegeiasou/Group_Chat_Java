@@ -2,7 +2,7 @@
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
+import java.io.*;
 import javax.swing.*;
 
 public class RegistrationForm extends JFrame implements ActionListener
