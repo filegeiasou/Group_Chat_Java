@@ -147,8 +147,4 @@ public class RegistrationForm extends JFrame implements ActionListener
             new Database(uname.getText(), upass.getText(), email.getText(), choice);
         }
     }
-
-    public static void main(String[] args) throws IOException {
-        new RegistrationForm();
-    }
 }
