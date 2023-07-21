@@ -136,7 +136,7 @@ class ClientHandler implements Runnable
             // ResultSet resultSet = statement.executeQuery("SELECT * FROM USERS");
 
             // using a string for the SQL query
-            String query = "SELECT * FROM USERS WHERE USERNAME = ? AND PASSW = ?";
+            String query = "SELECT * FROM USERS WHERE USERNAME = ? AND PASSWORD= ?";
 
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, username);
