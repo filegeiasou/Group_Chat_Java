@@ -1,0 +1,15 @@
+DROP DATABASE IF EXISTS chat;
+CREATE DATABASE chat;
+USE chat;
+
+CREATE TABLE users
+(
+	user_id INT NOT NULL AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    sex VARCHAR(10) NOT NULL,
+    PRIMARY KEY(user_id)
+);
+
+SELECT * FROM users;
