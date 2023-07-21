@@ -1,4 +1,4 @@
-//package ChatApp;
+package ChatApp;
 
 import java.util.ArrayList;
 import java.net.ServerSocket;
